@@ -29,7 +29,7 @@ import java.util.List;
 public class AlbumsBean {
 
     @PersistenceContext(unitName = "albums")
-    private EntityManager entityManager ;
+    private EntityManager entityManager;
 
 
     public void addAlbum(Album album) {

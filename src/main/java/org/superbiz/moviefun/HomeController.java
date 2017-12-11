@@ -35,7 +35,7 @@ public class HomeController {
     public HomeController(MoviesBean moviesBean, AlbumsBean albumsBean,
                           MovieFixtures movieFixtures, AlbumFixtures albumFixtures,
                           @Qualifier("albumsTM") PlatformTransactionManager albumTM,
-                          @Qualifier("moviesTM") PlatformTransactionManager moviesTM) {
+                          @Qualifier("moviesTM") PlatformTransactionManager moviesTM){
         this.moviesBean = moviesBean;
         this.albumsBean = albumsBean;
         this.movieFixtures = movieFixtures;
@@ -51,26 +51,30 @@ public class HomeController {
 
     @GetMapping("/setup")
     public String setup(Map<String, Object> model) {
+        createMovies();
+        createAlbums();
+        model.put("movies", moviesBean.getMovies());
+        model.put("albums", albumsBean.getAlbums());
+        return "setup";
+    }
 
+    public void createAlbums() {
         TransactionStatus at = albumsTM.getTransaction(null);
         for (Album album : albumFixtures.load()) {
             albumsBean.addAlbum(album);
         }
         albumsTM.commit(at);
+    }
 
+    public void createMovies() {
+        System.out.println("Movie Title: ->>>>>>>>>>>>>>>>>>>in setup");
         TransactionStatus mt = moviesTM.getTransaction(null);
+        System.out.println("Movie Title: ->>>>>>>>>>>>>>>>>>>before for loop");
         for (Movie movie : movieFixtures.load()) {
+            System.out.println("Movie Title: ->>>>>>>>>>>>>>>>>>>>" + movie.getTitle());
             moviesBean.addMovie(movie);
+            System.out.println("Movie Title: ->>>>>>>>>>>>>>>>>>>>after adding movie");
         }
-
         moviesTM.commit(mt);
-
-
-
-
-        model.put("movies", moviesBean.getMovies());
-        model.put("albums", albumsBean.getAlbums());
-
-        return "setup";
     }
 }
