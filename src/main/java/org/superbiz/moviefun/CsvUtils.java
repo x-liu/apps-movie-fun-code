@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -13,18 +14,20 @@ import java.util.Scanner;
 public class CsvUtils {
 
     public static String readFile(String path) {
-        try {
-            Scanner scanner = new Scanner(new File(path)).useDelimiter("\\A");
+//                    Scanner scanner = new Scanner(new File(path)).useDelimiter("\\A");
 
-            if (scanner.hasNext()) {
-                return scanner.next();
-            } else {
-                return "";
-            }
-
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+        InputStream is = CsvUtils.class.getClassLoader().getResourceAsStream(path);
+        if (is == null) {
+            throw new RuntimeException("missing resource " + path);
         }
+        Scanner scanner = new Scanner(is);
+        scanner.useDelimiter("\\A");
+        if (scanner.hasNext()) {
+            return scanner.next();
+        } else {
+            return "";
+        }
+
     }
 
     public static <T> List<T> readFromCsv(ObjectReader objectReader, String path) {
@@ -34,6 +37,8 @@ public class CsvUtils {
             MappingIterator<T> iterator = objectReader.readValues(readFile(path));
 
             while (iterator.hasNext()) {
+                System.out.println("inside iterator ->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//                System.out.println(iterator.nextValue());
                 results.add(iterator.nextValue());
             }
 
