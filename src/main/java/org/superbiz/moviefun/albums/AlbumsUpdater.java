@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.superbiz.moviefun.CsvUtils;
 import org.superbiz.moviefun.blobstore.Blob;
 import org.superbiz.moviefun.blobstore.BlobStore;
 
@@ -40,14 +41,8 @@ public class AlbumsUpdater {
     }
 
     public void update() throws IOException {
-        Optional<Blob> maybeBlob = blobStore.get("albums.csv");
-
-        if (!maybeBlob.isPresent()) {
-            logger.info("No albums.csv found when running AlbumsUpdater!");
-            return;
-        }
-
-        List<Album> albumsToHave = readFromCsv(objectReader, maybeBlob.get().inputStream);
+        List<Album> albumsToHave = readFromCsv(objectReader, "albums.csv");
+        logger.warn("albums to have",albumsToHave.toString());
         List<Album> albumsWeHave = albumsBean.getAlbums();
 
         createNewAlbums(albumsToHave, albumsWeHave);
